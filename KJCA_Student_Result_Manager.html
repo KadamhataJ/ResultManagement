@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Result Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+        }
+
+        body {
+            padding: 20px;
+            background-color: #f4f4f4;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .header {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+        }
+
+        .form-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .result-table th, .result-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .result-table th {
+            background-color: #f2f2f2;
+        }
+
+        .grade-A-plus {
+            background-color: #d4edda;
+            color: #155724;
+            font-weight: bold;
+        }
+
+        .grade-A {
+            background-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .grade-A-minus {
+            background-color: #b8dfc1;
+            color: #155724;
+        }
+
+        .grade-B {
+            background-color: #ffeeba;
+            color: #856404;
+        }
+
+        .grade-C {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .grade-D {
+            background-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .grade-F {
+            background-color: #f1b0b7;
+            color: #721c24;
+            font-weight: bold;
+        }
+
+        .scrollable-subjects {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .term-total {
+            font-weight: bold;
+            background-color: #e9ecef;
+        }
+
+        .student-list-item {
+            cursor: pointer;
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .student-list-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .student-list-item.active {
+            background-color: #e9f7fe;
+            font-weight: bold;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                padding: 0;
+                background-color: white;
+            }
+            .card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+            .header {
+                box-shadow: none;
+                border-bottom: 2px solid #333;
+            }
+            .result-summary-pdf {
+                padding: 20px;
+            }
+            .result-summary-pdf h3 {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .result-summary-pdf .school-info {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .result-summary-pdf .student-info {
+                margin-bottom: 20px;
+            }
+            .result-summary-pdf .result-table {
+                margin-bottom: 30px;
+            }
+            .result-summary-pdf .signature-area {
+                margin-top: 50px;
+                display: flex;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="header">
+            <h1>Kadamhata J.C Academy</h1>
+            <h2>Student Result Management System</h2>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user-plus me-2"></i>Student Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="studentForm">
+                            <div class="mb-3">
+                                <label for="studentName" class="form-label">Student Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="studentName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fatherName" class="form-label">Father's Name</label>
+                                <input type="text" class="form-control" id="fatherName">
+                            </div>
+                            <div class="mb-3">
+                                <label for="motherName" class="form-label">Mother's Name</label>
+                                <input type="text" class="form-control" id="motherName">
+                            </div>
+                            <div class="mb-3">
+                                <label for="dob" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="dob">
+                            </div>
+                            <div class="mb-3">
+                                <label for="standard" class="form-label">Standard/Class <span class="text-danger">*</span></label>
+                                <select class="form-select" id="standard" required>
+                                    <option value="">Select Standard</option>
+                                    <option value="Class 1">Class 1</option>
+                                    <option value="Class 2">Class 2</option>
+                                    <option value="Class 3">Class 3</option>
+                                    <option value="Class 4">Class 4</option>
+                                    <option value="Class 5">Class 5</option>
+                                    <option value="Class 6">Class 6</option>
+                                    <option value="Class 7">Class 7</option>
+                                    <option value="Class 8">Class 8</option>
+                                    <option value="Class 9">Class 9</option>
+                                    <option value="Class 10">Class 10</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rollId" class="form-label">Roll/ID Number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="rollId" required>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    <i class="fas fa-save me-2"></i>Save Information
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="newStudentBtn">
+                                    <i class="fas fa-user-plus me-2"></i>New Student
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card no-print">
+                    <div class="card-header bg-info">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3><i class="fas fa-users me-2"></i>Students List</h3>
+                            <button class="btn btn-sm btn-outline-light" id="exportAllPdfBtn">
+                                <i class="fas fa-file-pdf me-1"></i>Export All
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="input-group p-3">
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search by name or roll...">
+                            <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <div id="studentsList" style="max-height: 300px; overflow-y: auto;">
+                            <!-- Students list will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-success">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3><i class="fas fa-poll me-2"></i>Result Management</h3>
+                            <div>
+                                <button class="btn btn-sm btn-outline-light me-2" id="printBtn">
+                                    <i class="fas fa-print me-1"></i>Print
+                                </button>
+                                <button class="btn btn-sm btn-outline-light" id="exportPdfBtn">
+                                    <i class="fas fa-file-pdf me-1"></i>PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="studentInfoSection" class="mb-4" style="display: none;">
+                            <h4>Student Information</h4>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th>Name</th>
+                                    <td id="displayName"></td>
+                                    <th>Roll/ID</th>
+                                    <td id="displayRollId"></td>
+                                </tr>
+                                <tr>
+                                    <th>Father's Name</th>
+                                    <td id="displayFatherName"></td>
+                                    <th>Mother's Name</th>
+                                    <td id="displayMotherName"></td>
+                                </tr>
+                                <tr>
+                                    <th>Date of Birth</th>
+                                    <td id="displayDob"></td>
+                                    <th>Standard</th>
+                                    <td id="displayStandard"></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div id="resultFormSection" style="display: none;">
+                            <h4 class="mb-3">Enter Results</h4>
+                            <ul class="nav nav-tabs mb-3" id="termTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="first-term-tab" data-bs-toggle="tab" data-bs-target="#first-term" type="button" role="tab">First Term</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="second-term-tab" data-bs-toggle="tab" data-bs-target="#second-term" type="button" role="tab">Second Term</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="final-term-tab" data-bs-toggle="tab" data-bs-target="#final-term" type="button" role="tab">Final Term</button>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content" id="termTabContent">
+                                <div class="tab-pane fade show active" id="first-term" role="tabpanel">
+                                    <div class="scrollable-subjects">
+                                        <table class="result-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Subject</th>
+                                                    <th>Marks (Out of 100)</th>
+                                                    <th>Grade</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="firstTermSubjects">
+                                                <!-- Subjects will be added here by JavaScript -->
+                                            </tbody>
+                                            <tfoot id="firstTermTotal">
+                                                <!-- Total row will be added here by JavaScript -->
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button class="btn btn-primary" id="saveFirstTerm">Save First Term Results</button>
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="second-term" role="tabpanel">
+                                    <div class="scrollable-subjects">
+                                        <table class="result-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Subject</th>
+                                                    <th>Marks (Out of 100)</th>
+                                                    <th>Grade</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="secondTermSubjects">
+                                                <!-- Subjects will be added here by JavaScript -->
+                                            </tbody>
+                                            <tfoot id="secondTermTotal">
+                                                <!-- Total row will be added here by JavaScript -->
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button class="btn btn-primary" id="saveSecondTerm">Save Second Term Results</button>
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="final-term" role="tabpanel">
+                                    <div class="scrollable-subjects">
+                                        <table class="result-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Subject</th>
+                                                    <th>Marks (Out of 100)</th>
+                                                    <th>Grade</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="finalTermSubjects">
+                                                <!-- Subjects will be added here by JavaScript -->
+                                            </tbody>
+                                            <tfoot id="finalTermTotal">
+                                                <!-- Total row will be added here by JavaScript -->
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button class="btn btn-primary" id="saveFinalTerm">Save Final Term Results</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="resultSummarySection" style="display: none;">
+                            <h4 class="mb-3">Result Summary</h4>
+                            <table class="result-table">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>First Term</th>
+                                        <th>Second Term</th>
+                                        <th>Final Term</th>
+                                        <th>Total</th>
+                                        <th>Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultSummary">
+                                    <!-- Summary will be added here by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="4">Grand Total</th>
+                                        <th id="grandTotal">0</th>
+                                        <th id="finalGrade">-</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div id="noStudentMessage" class="text-center py-5">
+                            <i class="fas fa-user-graduate fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No student selected</h4>
+                            <p class="text-muted">Please enter student information or select from the list</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script>
+        // Initialize variables
+        let students = JSON.parse(localStorage.getItem('students')) || [];
+        let currentStudent = null;
+        const { jsPDF } = window.jspdf;
+
+        // Subjects with "Not Applicable" option
+        const subjects = [
+            { name: "English", hasNa: false },
+            { name: "English Grammar", hasNa: true },
+            { name: "Bangla", hasNa: false },
+            { name: "Bangla Grammar", hasNa: true },
+            { name: "Mathematics", hasNa: false },
+            { name: "Science", hasNa: false },
+            { name: "Social Education", hasNa: false },
+            { name: "Drawing", hasNa: true }
+        ];
+
+        // Grading system based on Bangladesh education
+        const gradingSystem = [
+            { min: 80, max: 100, grade: "A+", gpa: 5.0 },
+            { min: 70, max: 79, grade: "A", gpa: 4.0 },
+            { min: 60, max: 69, grade: "A-", gpa: 3.5 },
+            { min: 50, max: 59, grade: "B", gpa: 3.0 },
+            { min: 40, max: 49, grade: "C", gpa: 2.0 },
+            { min: 33, max: 39, grade: "D", gpa: 1.0 },
+            { min: 0, max: 32, grade: "F", gpa: 0.0 }
+        ];
+
+        // DOM Content Loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Form submission
+            document.getElementById('studentForm').addEventListener('submit', handleStudentFormSubmit);
+            
+            // Search functionality
+            document.getElementById('searchBtn').addEventListener('click', handleSearch);
+            document.getElementById('searchInput').addEventListener('input', handleSearch);
+            
+            // New student button
+            document.getElementById('newStudentBtn').addEventListener('click', resetForm);
+            
+            // Result saving
+            document.getElementById('saveFirstTerm').addEventListener('click', () => saveResults('firstTerm'));
+            document.getElementById('saveSecondTerm').addEventListener('click', () => saveResults('secondTerm'));
+            document.getElementById('saveFinalTerm').addEventListener('click', () => saveResults('finalTerm'));
+            
+            // Print and PDF
+            document.getElementById('printBtn').addEventListener('click', printResult);
+            document.getElementById('exportPdfBtn').addEventListener('click', exportToPdf);
+            document.getElementById('exportAllPdfBtn').addEventListener('click', exportAllToPdf);
+            
+            // Initialize subject tables
+            initializeSubjectTables();
+            
+            // Load students list
+            updateStudentsList();
+        });
+
+        // Handle student form submission
+        function handleStudentFormSubmit(e) {
+            e.preventDefault();
+            
+            const studentName = document.getElementById('studentName').value.trim();
+            const fatherName = document.getElementById('fatherName').value.trim();
+            const motherName = document.getElementById('motherName').value.trim();
+            const dob = document.getElementById('dob').value;
+            const standard = document.getElementById('standard').value;
+            const rollId = document.getElementById('rollId').value.trim();
+            
+            // Check if student already exists
+            const existingIndex = students.findIndex(s => s.rollId === rollId);
+            
+            const student = {
+                studentName,
+                fatherName,
+                motherName,
+                dob,
+                standard,
+                rollId,
+                firstTerm: {},
+                secondTerm: {},
+                finalTerm: {}
+            };
+            
+            if (existingIndex !== -1) {
+                // Update existing student
+                students[existingIndex] = student;
+            } else {
+                // Add new student
+                students.push(student);
+            }
+            
+            saveToLocalStorage();
+            loadStudent(rollId);
+            updateStudentsList();
+            resetForm();
+        }
+
+        // Save to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('students', JSON.stringify(students));
+        }
+
+        // Update students list in sidebar
+        function updateStudentsList() {
+            const studentsList = document.getElementById('studentsList');
+            studentsList.innerHTML = '';
+            
+            if (students.length === 0) {
+                studentsList.innerHTML = '<div class="p-3 text-center text-muted">No students found</div>';
+                return;
+            }
+            
+            // Sort students by standard and then by name
+            students.sort((a, b) => {
+                if (a.standard === b.standard) {
+                    return a.studentName.localeCompare(b.studentName);
+                }
+                return a.standard.localeCompare(b.standard);
+            });
+            
+            let currentStandard = '';
+            
+            students.forEach(student => {
+                if (student.standard !== currentStandard) {
+                    // Add standard header
+                    const header = document.createElement('div');
+                    header.className = 'p-2 bg-light fw-bold';
+                    header.textContent = student.standard;
+                    studentsList.appendChild(header);
+                    currentStandard = student.standard;
+                }
+                
+                // Add student item
+                const studentItem = document.createElement('div');
+                studentItem.className = 'student-list-item d-flex justify-content-between align-items-center';
+                if (currentStudent && currentStudent.rollId === student.rollId) {
+                    studentItem.classList.add('active');
+                }
+                
+                studentItem.innerHTML = `
+                    <span>${student.studentName}</span>
+                    <small class="text-muted">${student.rollId}</small>
+                `;
+                
+                studentItem.addEventListener('click', () => {
+                    loadStudent(student.rollId);
+                    // Update active state
+                    document.querySelectorAll('.student-list-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    studentItem.classList.add('active');
+                });
+                
+                studentsList.appendChild(studentItem);
+            });
+        }
+
+        // Load student data
+        function loadStudent(rollId) {
+            currentStudent = students.find(s => s.rollId === rollId);
+            
+            if (currentStudent) {
+                // Display student info
+                document.getElementById('displayName').textContent = currentStudent.studentName;
+                document.getElementById('displayFatherName').textContent = currentStudent.fatherName;
+                document.getElementById('displayMotherName').textContent = currentStudent.motherName;
+                document.getElementById('displayDob').textContent = formatDate(currentStudent.dob);
+                document.getElementById('displayStandard').textContent = currentStudent.standard;
+                document.getElementById('displayRollId').textContent = currentStudent.rollId;
+                
+                // Show sections
+                document.getElementById('studentInfoSection').style.display = 'block';
+                document.getElementById('resultFormSection').style.display = 'block';
+                document.getElementById('resultSummarySection').style.display = 'block';
+                document.getElementById('noStudentMessage').style.display = 'none';
+                
+                // Load results into form
+                loadResults('firstTerm', 'firstTermSubjects', 'firstTermTotal');
+                loadResults('secondTerm', 'secondTermSubjects', 'secondTermTotal');
+                loadResults('finalTerm', 'finalTermSubjects', 'finalTermTotal');
+                
+                // Calculate and display summary
+                calculateSummary();
+            }
+        }
+
+        // Load results into form
+        function loadResults(term, tableId, totalId) {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = '';
+            
+            let termTotal = 0;
+            let termSubjectsCount = 0;
+            
+            subjects.forEach(subject => {
+                const row = document.createElement('tr');
+                
+                // Subject name
+                const subjectCell = document.createElement('td');
+                subjectCell.textContent = subject.name;
+                row.appendChild(subjectCell);
+                
+                // Marks input
+                const marksCell = document.createElement('td');
+                const marksInput = document.createElement('input');
+                marksInput.type = 'number';
+                marksInput.className = 'form-control';
+                marksInput.min = '0';
+                marksInput.max = '100';
+                marksInput.value = currentStudent[term][subject.name]?.marks || '';
+                marksInput.dataset.subject = subject.name;
+                
+                if (subject.hasNa) {
+                    const inputGroup = document.createElement('div');
+                    inputGroup.className = 'input-group';
+                    
+                    marksInput.className = 'form-control';
+                    marksInput.placeholder = 'Marks';
+                    
+                    const naButton = document.createElement('button');
+                    naButton.className = 'btn btn-outline-secondary';
+                    naButton.type = 'button';
+                    naButton.textContent = 'N/A';
+                    naButton.onclick = function() {
+                        marksInput.value = 'N/A';
+                        marksInput.readOnly = true;
+                    };
+                    
+                    inputGroup.appendChild(marksInput);
+                    inputGroup.appendChild(naButton);
+                    marksCell.appendChild(inputGroup);
+                } else {
+                    marksCell.appendChild(marksInput);
+                }
+                row.appendChild(marksCell);
+                
+                // Grade display
+                const gradeCell = document.createElement('td');
+                const marks = currentStudent[term][subject.name]?.marks;
+                if (marks === 'N/A') {
+                    gradeCell.textContent = 'N/A';
+                } else if (marks) {
+                    const gradeInfo = calculateGrade(marks);
+                    gradeCell.textContent = gradeInfo.grade;
+                    gradeCell.className = `grade-${gradeInfo.grade.replace('+', '-plus').replace('-', '-minus')}`;
+                    
+                    // Add to term total if not N/A
+                    termTotal += parseInt(marks);
+                    termSubjectsCount++;
+                }
+                row.appendChild(gradeCell);
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add term total row
+            const totalRow = document.createElement('tr');
+            totalRow.className = 'term-total';
+            
+            const totalLabelCell = document.createElement('td');
+            totalLabelCell.colSpan = 2;
+            totalLabelCell.textContent = 'Total';
+            totalRow.appendChild(totalLabelCell);
+            
+            const totalValueCell = document.createElement('td');
+            if (termSubjectsCount > 0) {
+                const average = Math.round(termTotal / termSubjectsCount);
+                const gradeInfo = calculateGrade(average);
+                totalValueCell.textContent = `${average} (${gradeInfo.grade})`;
+                totalValueCell.className = `grade-${gradeInfo.grade.replace('+', '-plus').replace('-', '-minus')}`;
+            } else {
+                totalValueCell.textContent = '-';
+            }
+            totalRow.appendChild(totalValueCell);
+            
+            document.getElementById(totalId).innerHTML = '';
+            document.getElementById(totalId).appendChild(totalRow);
+        }
+
+        // Save results
+        function saveResults(term) {
+            if (!currentStudent) return;
+            
+            const tableId = `${term}Subjects`;
+            const rows = document.getElementById(tableId).querySelectorAll('tr');
+            
+            // Clear previous results for this term
+            currentStudent[term] = {};
+            
+            let termTotal = 0;
+            let termSubjectsCount = 0;
+            
+            rows.forEach(row => {
+                const subject = row.cells[0].textContent;
+                const marksInput = row.querySelector('input');
+                const marks = marksInput.value;
+                
+                if (marks) {
+                    currentStudent[term][subject] = {
+                        marks: marks,
+                        grade: marks === 'N/A' ? 'N/A' : calculateGrade(marks).grade
+                    };
+                    
+                    // Add to term total if not N/A
+                    if (marks !== 'N/A') {
+                        termTotal += parseInt(marks);
+                        termSubjectsCount++;
+                    }
+                }
+            });
+            
+            // Calculate term average and grade
+            if (termSubjectsCount > 0) {
+                const average = Math.round(termTotal / termSubjectsCount);
+                currentStudent[term].termTotal = average;
+                currentStudent[term].termGrade = calculateGrade(average).grade;
+            }
+            
+            saveToLocalStorage();
+            loadStudent(currentStudent.rollId); // Refresh the view
+            updateStudentsList();
+            alert(`${term.charAt(0).toUpperCase() + term.slice(1)} results saved successfully!`);
+        }
+
+        // Calculate grade
+        function calculateGrade(marks) {
+            if (marks === 'N/A') return { grade: 'N/A', gpa: 0 };
+            
+            const numericMarks = parseInt(marks);
+            for (const grade of gradingSystem) {
+                if (numericMarks >= grade.min && numericMarks <= grade.max) {
+                    return grade;
+                }
+            }
+            return { grade: 'F', gpa: 0.0 };
+        }
+
+        // Calculate summary
+        function calculateSummary() {
+            if (!currentStudent) return;
+            
+            const summaryBody = document.getElementById('resultSummary');
+            summaryBody.innerHTML = '';
+            
+            let grandTotal = 0;
+            let totalSubjects = 0;
+            
+            subjects.forEach(subject => {
+                const row = document.createElement('tr');
+                
+                // Subject name
+                const subjectCell = document.createElement('td');
+                subjectCell.textContent = subject.name;
+                row.appendChild(subjectCell);
+                
+                // Terms
+                const firstTerm = currentStudent.firstTerm[subject.name] || {};
+                const secondTerm = currentStudent.secondTerm[subject.name] || {};
+                const finalTerm = currentStudent.finalTerm[subject.name] || {};
+                
+                const firstTermCell = createTermCell(firstTerm);
+                const secondTermCell = createTermCell(secondTerm);
+                const finalTermCell = createTermCell(finalTerm);
+                
+                row.appendChild(firstTermCell);
+                row.appendChild(secondTermCell);
+                row.appendChild(finalTermCell);
+                
+                // Total and grade
+                if (firstTerm.marks && secondTerm.marks && finalTerm.marks && 
+                    firstTerm.marks !== 'N/A' && secondTerm.marks !== 'N/A' && finalTerm.marks !== 'N/A') {
+                    const total = parseInt(firstTerm.marks) + parseInt(secondTerm.marks) + parseInt(finalTerm.marks);
+                    const average = Math.round(total / 3);
+                    const gradeInfo = calculateGrade(average);
+                    
+                    const totalCell = document.createElement('td');
+                    totalCell.textContent = average;
+                    row.appendChild(totalCell);
+                    
+                    const gradeCell = document.createElement('td');
+                    gradeCell.textContent = gradeInfo.grade;
+                    gradeCell.className = `grade-${gradeInfo.grade.replace('+', '-plus').replace('-', '-minus')}`;
+                    row.appendChild(gradeCell);
+                    
+                    grandTotal += average;
+                    totalSubjects++;
+                } else {
+                    const totalCell = document.createElement('td');
+                    totalCell.textContent = '-';
+                    row.appendChild(totalCell);
+                    
+                    const gradeCell = document.createElement('td');
+                    gradeCell.textContent = '-';
+                    row.appendChild(gradeCell);
+                }
+                
+                summaryBody.appendChild(row);
+            });
+            
+            // Calculate final grade
+            document.getElementById('grandTotal').textContent = grandTotal;
+            
+            if (totalSubjects > 0) {
+                const average = Math.round(grandTotal / totalSubjects);
+                const finalGradeInfo = calculateGrade(average);
+                const finalGradeCell = document.getElementById('finalGrade');
+                finalGradeCell.textContent = finalGradeInfo.grade;
+                finalGradeCell.className = `grade-${finalGradeInfo.grade.replace('+', '-plus').replace('-', '-minus')}`;
+            }
+        }
+
+        // Create term cell for summary
+        function createTermCell(termData) {
+            const cell = document.createElement('td');
+            
+            if (termData.marks) {
+                cell.textContent = termData.marks;
+                if (termData.marks !== 'N/A') {
+                    cell.className = `grade-${termData.grade.replace('+', '-plus').replace('-', '-minus')}`;
+                }
+            } else {
+                cell.textContent = '-';
+            }
+            
+            return cell;
+        }
+
+        // Initialize subject tables
+        function initializeSubjectTables() {
+            const firstTermBody = document.getElementById('firstTermSubjects');
+            const secondTermBody = document.getElementById('secondTermSubjects');
+            const finalTermBody = document.getElementById('finalTermSubjects');
+            
+            subjects.forEach(subject => {
+                // First term
+                const firstTermRow = createSubjectRow(subject);
+                firstTermBody.appendChild(firstTermRow);
+                
+                // Second term
+                const secondTermRow = createSubjectRow(subject);
+                secondTermBody.appendChild(secondTermRow);
+                
+                // Final term
+                const finalTermRow = createSubjectRow(subject);
+                finalTermBody.appendChild(finalTermRow);
+            });
+        }
+
+        // Create subject row
+        function createSubjectRow(subject) {
+            const row = document.createElement('tr');
+            
+            // Subject name
+            const subjectCell = document.createElement('td');
+            subjectCell.textContent = subject.name;
+            row.appendChild(subjectCell);
+            
+            // Marks input
+            const marksCell = document.createElement('td');
+            const marksInput = document.createElement('input');
+            marksInput.type = 'number';
+            marksInput.className = 'form-control';
+            marksInput.min = '0';
+            marksInput.max = '100';
+            marksInput.dataset.subject = subject.name;
+            
+            if (subject.hasNa) {
+                const inputGroup = document.createElement('div');
+                inputGroup.className = 'input-group';
+                
+                marksInput.className = 'form-control';
+                marksInput.placeholder = 'Marks';
+                
+                const naButton = document.createElement('button');
+                naButton.className = 'btn btn-outline-secondary';
+                naButton.type = 'button';
+                naButton.textContent = 'N/A';
+                naButton.onclick = function() {
+                    marksInput.value = 'N/A';
+                    marksInput.readOnly = true;
+                };
+                
+                inputGroup.appendChild(marksInput);
+                inputGroup.appendChild(naButton);
+                marksCell.appendChild(inputGroup);
+            } else {
+                marksCell.appendChild(marksInput);
+            }
+            row.appendChild(marksCell);
+            
+            // Grade display
+            const gradeCell = document.createElement('td');
+            row.appendChild(gradeCell);
+            
+            return row;
+        }
+
+        // Handle search
+        function handleSearch() {
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            
+            const studentsList = document.getElementById('studentsList');
+            const studentItems = studentsList.querySelectorAll('.student-list-item');
+            
+            if (studentItems.length === 0) return;
+            
+            let found = false;
+            
+            studentItems.forEach(item => {
+                const studentName = item.querySelector('span').textContent.toLowerCase();
+                const rollId = item.querySelector('small').textContent.toLowerCase();
+                
+                if (studentName.includes(searchTerm) || rollId.includes(searchTerm)) {
+                    item.style.display = '';
+                    found = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Also handle standard headers
+            const headers = studentsList.querySelectorAll('.bg-light');
+            headers.forEach(header => {
+                const standard = header.textContent.toLowerCase();
+                if (standard.includes(searchTerm)) {
+                    header.style.display = '';
+                } else {
+                    // Check if any student in this standard matches
+                    let hasVisibleStudents = false;
+                    let nextElement = header.nextElementSibling;
+                    
+                    while (nextElement && !nextElement.classList.contains('bg-light')) {
+                        if (nextElement.style.display !== 'none') {
+                            hasVisibleStudents = true;
+                            break;
+                        }
+                        nextElement = nextElement.nextElementSibling;
+                    }
+                    
+                    header.style.display = hasVisibleStudents ? '' : 'none';
+                }
+            });
+        }
+
+        // Print result
+        function printResult() {
+            if (!currentStudent) {
+                alert('No student selected to print');
+                return;
+            }
+            
+            // Create a printable version
+            const printableContent = createPrintableContent();
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printableContent);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        }
+
+        // Export to PDF (single student)
+        function exportToPdf() {
+            if (!currentStudent) {
+                alert('No student selected to export');
+                return;
+            }
+            
+            generateStudentPdf(currentStudent);
+        }
+
+        // Export all students to PDF
+        function exportAllToPdf() {
+            if (students.length === 0) {
+                alert('No students to export');
+                return;
+            }
+            
+            // Create a new PDF
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            // Generate a PDF for each student
+            students.forEach((student, index) => {
+                if (index > 0) {
+                    pdf.addPage(); // Add new page for each student after the first
+                }
+                
+                // Create printable content for this student
+                const printableContent = createPrintableContentForStudent(student);
+                
+                // Create a temporary div to hold the content for PDF generation
+                const tempDiv = document.createElement('div');
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px';
+                tempDiv.innerHTML = printableContent;
+                document.body.appendChild(tempDiv);
+                
+                // Generate PDF page
+                return html2canvas(tempDiv, {
+                    scale: 2,
+                    logging: false,
+                    useCORS: true
+                }).then(canvas => {
+                    document.body.removeChild(tempDiv);
+                    
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                    
+                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                });
+            }).then(() => {
+                // After all students are added, save the PDF
+                pdf.save('All_Students_Results.pdf');
+            });
+        }
+
+        // Generate PDF for a single student
+        function generateStudentPdf(student) {
+            // Create printable content
+            const printableContent = createPrintableContentForStudent(student);
+            
+            // Create a temporary div to hold the content for PDF generation
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.left = '-9999px';
+            tempDiv.innerHTML = printableContent;
+            document.body.appendChild(tempDiv);
+            
+            // Generate PDF
+            html2canvas(tempDiv, {
+                scale: 2,
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                document.body.removeChild(tempDiv);
+                
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgData = canvas.toDataURL('image/png');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(`${student.studentName}_Result.pdf`);
+            });
+        }
+
+        // Create printable content for the current student
+        function createPrintableContent() {
+            if (!currentStudent) return '';
+            return createPrintableContentForStudent(currentStudent);
+        }
+
+        // Create printable content for any student
+        function createPrintableContentForStudent(student) {
+            // Calculate term totals if not already calculated
+            if (!student.firstTerm.termTotal) {
+                calculateTermTotalForStudent(student, 'firstTerm');
+            }
+            if (!student.secondTerm.termTotal) {
+                calculateTermTotalForStudent(student, 'secondTerm');
+            }
+            if (!student.finalTerm.termTotal) {
+                calculateTermTotalForStudent(student, 'finalTerm');
+            }
+            
+            // Create the printable HTML
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${student.studentName}'s Result</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            padding: 20px;
+                        }
+                        .school-info {
+                            text-align: center;
+                            margin-bottom: 20px;
+                        }
+                        .school-info h1 {
+                            margin: 0;
+                            font-size: 24px;
+                        }
+                        .school-info h2 {
+                            margin: 5px 0 0;
+                            font-size: 18px;
+                            color: #555;
+                        }
+                        .student-info {
+                            margin-bottom: 20px;
+                        }
+                        .student-info table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        .student-info th, .student-info td {
+                            border: 1px solid #ddd;
+                            padding: 8px;
+                            text-align: left;
+                        }
+                        .student-info th {
+                            background-color: #f2f2f2;
+                            width: 20%;
+                        }
+                        .result-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 20px;
+                        }
+                        .result-table th, .result-table td {
+                            border: 1px solid #ddd;
+                            padding: 8px;
+                            text-align: center;
+                        }
+                        .result-table th {
+                            background-color: #f2f2f2;
+                        }
+                        .term-total {
+                            font-weight: bold;
+                            background-color: #e9ecef;
+                        }
+                        .grade-A-plus {
+                            background-color: #d4edda;
+                            color: #155724;
+                            font-weight: bold;
+                        }
+                        .grade-A {
+                            background-color: #c3e6cb;
+                            color: #155724;
+                        }
+                        .grade-A-minus {
+                            background-color: #b8dfc1;
+                            color: #155724;
+                        }
+                        .grade-B {
+                            background-color: #ffeeba;
+                            color: #856404;
+                        }
+                        .grade-C {
+                            background-color: #f8d7da;
+                            color: #721c24;
+                        }
+                        .grade-D {
+                            background-color: #f5c6cb;
+                            color: #721c24;
+                        }
+                        .grade-F {
+                            background-color: #f1b0b7;
+                            color: #721c24;
+                            font-weight: bold;
+                        }
+                        .signature-area {
+                            margin-top: 40px;
+                            display: flex;
+                            justify-content: space-between;
+                        }
+                        .signature-box {
+                            text-align: center;
+                            width: 30%;
+                        }
+                        .signature-line {
+                            border-top: 1px solid #000;
+                            margin-top: 50px;
+                            padding-top: 5px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="school-info">
+                        <h1>Kadamhata J.C Academy</h1>
+                        <h2>Academic Result</h2>
+                    </div>
+                    
+                    <div class="student-info">
+                        <table>
+                            <tr>
+                                <th>Student Name</th>
+                                <td>${student.studentName}</td>
+                                <th>Roll/ID</th>
+                                <td>${student.rollId}</td>
+                            </tr>
+                            <tr>
+                                <th>Father's Name</th>
+                                <td>${student.fatherName}</td>
+                                <th>Mother's Name</th>
+                                <td>${student.motherName}</td>
+                            </tr>
+                            <tr>
+                                <th>Date of Birth</th>
+                                <td>${formatDate(student.dob)}</td>
+                                <th>Standard</th>
+                                <td>${student.standard}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <h3>Term-wise Results</h3>
+                    <table class="result-table">
+                        <thead>
+                            <tr>
+                                <th>Term</th>
+                                <th>Total Marks</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>First Term</td>
+                                <td class="${student.firstTerm.termTotal ? `grade-${student.firstTerm.termGrade.replace('+', '-plus').replace('-', '-minus')}` : ''}">
+                                    ${student.firstTerm.termTotal || '-'}
+                                </td>
+                                <td class="${student.firstTerm.termTotal ? `grade-${student.firstTerm.termGrade.replace('+', '-plus').replace('-', '-minus')}` : ''}">
+                                    ${student.firstTerm.termGrade || '-'}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Second Term</td>
+                                <td class="${student.secondTerm.termTotal ? `grade-${student.secondTerm.termGrade.replace('+', '-plus').replace('-', '-minus')}` : ''}">
+                                    ${student.secondTerm.termTotal || '-'}
+                                </td>
+                                <td class="${student.secondTerm.termTotal ? `grade-${student.secondTerm.termGrade.replace('+', '-plus').replace('-', '-minus')}` : ''}">
+                                    ${student.secondTerm.termGrade || '-'}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Final Term</td>
+                                <td class="${student.finalTerm.termTotal ? `grade-${student.finalTerm.termGrade.replace('+', '-plus').replace('-', '-minus')}` : ''}">
+                                    ${student.finalTerm.termTotal || '-'}
+                                </td>
+                                <td class="${student.finalTerm.termTotal ? `grade-${student.finalTerm.termGrade.replace('+', '-plus').replace('-', '-minus')}` : ''}">
+                                    ${student.finalTerm.termGrade || '-'}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <h3>Subject-wise Results</h3>
+                    <table class="result-table">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>First Term</th>
+                                <th>Second Term</th>
+                                <th>Final Term</th>
+                                <th>Average</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${subjects.map(subject => {
+                                const firstTerm = student.firstTerm[subject.name] || {};
+                                const secondTerm = student.secondTerm[subject.name] || {};
+                                const finalTerm = student.finalTerm[subject.name] || {};
+                                
+                                let average = '-';
+                                let grade = '-';
+                                let gradeClass = '';
+                                
+                                if (firstTerm.marks && secondTerm.marks && finalTerm.marks && 
+                                    firstTerm.marks !== 'N/A' && secondTerm.marks !== 'N/A' && finalTerm.marks !== 'N/A') {
+                                    const total = parseInt(firstTerm.marks) + parseInt(secondTerm.marks) + parseInt(finalTerm.marks);
+                                    average = Math.round(total / 3);
+                                    const gradeInfo = calculateGrade(average);
+                                    grade = gradeInfo.grade;
+                                    gradeClass = `grade-${gradeInfo.grade.replace('+', '-plus').replace('-', '-minus')}`;
+                                }
+                                
+                                return `
+                                    <tr>
+                                        <td>${subject.name}</td>
+                                        <td class="${firstTerm.marks && firstTerm.marks !== 'N/A' ? `grade-${firstTerm.grade.replace('+', '-plus').replace('-', '-minus')}` : ''}">
+                                            ${firstTerm.marks || '-'}
+                                        </td>
+                                        <td class="${secondTerm.marks && secondTerm.marks !== 'N/A' ? `grade-${secondTerm.grade.replace('+', '-plus').replace('-', '-minus')}` : ''}">
+                                            ${secondTerm.marks || '-'}
+                                        </td>
+                                        <td class="${finalTerm.marks && finalTerm.marks !== 'N/A' ? `grade-${finalTerm.grade.replace('+', '-plus').replace('-', '-minus')}` : ''}">
+                                            ${finalTerm.marks || '-'}
+                                        </td>
+                                        <td class="${gradeClass}">${average}</td>
+                                        <td class="${gradeClass}">${grade}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <div class="signature-area">
+                        <div class="signature-box">
+                            <div class="signature-line"></div>
+                            <p>Class Teacher</p>
+                        </div>
+                        <div class="signature-box">
+                            <div class="signature-line"></div>
+                            <p>Headmaster</p>
+                        </div>
+                        <div class="signature-box">
+                            <div class="signature-line"></div>
+                            <p>Guardian</p>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #777;">
+                        <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+                    </div>
+                </body>
+                </html>
+            `;
+        }
+
+        // Calculate term total for any student
+        function calculateTermTotalForStudent(student, term) {
+            let termTotal = 0;
+            let termSubjectsCount = 0;
+            
+            subjects.forEach(subject => {
+                const marks = student[term][subject.name]?.marks;
+                if (marks && marks !== 'N/A') {
+                    termTotal += parseInt(marks);
+                    termSubjectsCount++;
+                }
+            });
+            
+            if (termSubjectsCount > 0) {
+                student[term].termTotal = Math.round(termTotal / termSubjectsCount);
+                student[term].termGrade = calculateGrade(student[term].termTotal).grade;
+            }
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('studentForm').reset();
+            document.getElementById('studentInfoSection').style.display = 'none';
+            document.getElementById('resultFormSection').style.display = 'none';
+            document.getElementById('resultSummarySection').style.display = 'none';
+            document.getElementById('noStudentMessage').style.display = 'block';
+            
+            // Remove active state from all student list items
+            document.querySelectorAll('.student-list-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            currentStudent = null;
+        }
+    </script>
+</body>
+</html>
